@@ -1,56 +1,77 @@
-room = {}
+# Creating the board
+board = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9']
+]
 
-print("Enter the number of rooms")
-m = int(input())
+player = 'X'
+win = 0
 
-print("Enter the room number and status")
+# Loop for 9 moves
+for move in range(9):
 
-for i in range(m):
-    print("Enter the Room Number")
-    d = int(input())
+    # Display the board
+    print()
+    print(board[0][0], "|", board[0][1], "|", board[0][2])
+    print("--+---+--")
+    print(board[1][0], "|", board[1][1], "|", board[1][2])
+    print("--+---+--")
+    print(board[2][0], "|", board[2][1], "|", board[2][2])
 
-    print("Enter the status of the room (clean/dirty)")
-    k = input().lower()
+    # Get row and column
+    row = int(input("Player " + player + " enter row (1-3): "))
+    col = int(input("Player " + player + " enter column (1-3): "))
 
-    room[d] = k
+    # Put X or O
+    board[row - 1][col - 1] = player
 
-model = room.copy()
+    # Check rows
+    for i in range(3):
+        if (board[i][0] == player and
+            board[i][1] == player and
+            board[i][2] == player):
+            win = 1
 
-cc = 0
-dc = 0
+    # Check columns
+    for i in range(3):
+        if (board[0][i] == player and
+            board[1][i] == player and
+            board[2][i] == player):
+            win = 1
 
-print("\nInitial Room Model:")
-print(model)
+    # Check first diagonal
+    if (board[0][0] == player and
+        board[1][1] == player and
+        board[2][2] == player):
+        win = 1
 
-for i in sorted(model.keys()):
+    # Check second diagonal
+    if (board[0][2] == player and
+        board[1][1] == player and
+        board[2][0] == player):
+        win = 1
 
-    if cc == m:
-        print("All rooms are clean")
+    # Check winning status
+    if win == 1:
+        print("\nPlayer", player, "wins!")
         break
 
-    elif model[i] == "dirty":
-        print("Room", i, "is dirty")
-        print("Cleaning Room", i)
+    # Change player
+    if player == 'X':
+        player = 'O'
+    else:
+        player = 'X'
 
-        model[i] = "clean"
-        cc = cc + 1
 
-    elif model[i] == "clean":
+# Display final board
+print()
+print(board[0][0], "|", board[0][1], "|", board[0][2])
+print("--+---+--")
+print(board[1][0], "|", board[1][1], "|", board[1][2])
+print("--+---+--")
+print(board[2][0], "|", board[2][1], "|", board[2][2])
 
-        keys = sorted(model.keys())
-        pos = keys.index(i)
-
-        if pos + 1 < len(keys):
-            next_room = keys[pos + 1]
-
-            if model[next_room] == "dirty":
-                print("Moving Left")
-                dc = dc + 1
-
-        cc = cc + 1
-
-print("\nFinal Room Model:")
-print(model)
-
-if all(model[i] == "clean" for i in model):
-    print("All rooms are clean")
+# Check draw
+if win == 0:
+    print("\nGame Draw!")
