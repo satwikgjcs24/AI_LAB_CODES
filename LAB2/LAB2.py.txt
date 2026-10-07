@@ -1,0 +1,172 @@
+# 8-Puzzle using Iterative Deepening Depth-First Search (IDDFS)
+
+# Goal state
+GOAL = (1, 2, 3,
+        4, 5, 6,
+        7, 8, 0)   # 0 represents the blank space
+
+
+# Print the puzzle
+def print_puzzle(state):
+    print("+---+---+---+")
+    for i in range(0, 9, 3):
+        row = state[i:i+3]
+        print("|", end=" ")
+        for value in row:
+            if value == 0:
+                print(" ", end=" | ")
+            else:
+                print(value, end=" | ")
+        print()
+        print("+---+---+---+")
+
+
+# Generate all possible child states
+def get_children(state):
+    children = []
+
+    # Find the blank (0)
+    blank = state.index(0)
+
+    row = blank // 3
+    col = blank % 3
+
+    # Possible moves
+    moves = [
+        (-1, 0),  # Up
+        (1, 0),   # Down
+        (0, -1),  # Left
+        (0, 1)    # Right
+    ]
+
+    for dr, dc in moves:
+        new_row = row + dr
+        new_col = col + dc
+
+        # Check whether the move is valid
+        if 0 <= new_row < 3 and 0 <= new_col < 3:
+
+            new_blank = new_row * 3 + new_col
+
+            # Convert tuple to list so we can swap values
+            new_state = list(state)
+
+            # Move the tile into the blank position
+            new_state[blank], new_state[new_blank] = \
+                new_state[new_blank], new_state[blank]
+
+            children.append(tuple(new_state))
+
+    return children
+
+
+# Depth-Limited Search
+def dls(node, goal, limit, path, visited):
+
+    # Goal test
+    if node == goal:
+        return path
+
+    # Depth limit reached
+    if limit == 0:
+        return None
+
+    # Mark current state as visited
+    visited.add(node)
+
+    # Explore children
+    for child in get_children(node):
+
+        # Avoid states already on the current path
+        if child not in visited:
+
+            result = dls(
+                child,
+                goal,
+                limit - 1,
+                path + [child],
+                visited
+            )
+
+            if result is not None:
+                return result
+
+    # Remove state when going back
+    visited.remove(node)
+
+    return None
+
+
+# Iterative Deepening Search
+def ids(start, goal):
+
+    limit = 0
+
+    while True:
+
+        print("\nSearching with depth limit:", limit)
+
+        visited = set()
+
+        result = dls(
+            start,
+            goal,
+            limit,
+            [start],
+            visited
+        )
+
+        if result is not None:
+            print("\nSolution Found!")
+            return result
+
+        print("Not Found")
+
+        limit += 1
+
+
+# Main program
+def main():
+
+    print("8-PUZZLE USING IDDFS")
+    print("--------------------")
+
+    print("\nEnter the puzzle row by row.")
+    print("Use 0 for the blank space.")
+
+    numbers = []
+
+    for i in range(9):
+        value = int(input("Enter value " + str(i + 1) + ": "))
+        numbers.append(value)
+
+    start = tuple(numbers)
+
+    print("\nInitial State:")
+    print_puzzle(start)
+
+    print("\nGoal State:")
+    print_puzzle(GOAL)
+
+    # Check if already solved
+    if start == GOAL:
+        print("\nAlready at goal!")
+        return
+
+    # Solve using IDDFS
+    solution = ids(start, GOAL)
+
+    # Display solution
+    print("\n===== SOLUTION =====")
+
+    for step, state in enumerate(solution):
+
+        print("\nStep", step)
+        print_puzzle(state)
+
+    print("\nTotal moves:", len(solution) - 1)
+
+
+# Run program
+if __name__ == "__main__":
+    main()
